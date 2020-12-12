@@ -14,21 +14,27 @@ exports.handler = async (event) => {
         expand: ['items.data.price.product'],
     });
 
-    console.log(subscription);
+    const role = subscription.items.data[0].price.product.name.toLowerCase();
 
     // store the Netlify and Stripe IDs in Fauna
     await faunaFetch({
         query: `
-            mutation ($netlifyID: ID!, $stripeID: ID!) {
-                createUser(data: { netlifyID: $netlifyID, stripeID: $stripeID }) {
+            mutation ($netlifyID: ID!, $stripeID: ID!, $priceID, $planID, $planName) {
+                createUser(data: { netlifyID: $netlifyID, stripeID: $stripeID, priceID: $priceID, planID: $planID, planName: $planName }) {
                     netlifyID
                     stripeID
+                    priceID
+                    planID
+                    planName
                 }
             }
         `,
         variables: {
             netlifyID: user.id,
             stripeID: customer.id,
+            priceID: subscription.items.data[0].priceID,
+            planID: subscription.items.data[0].price.product.id,
+            planName: role,
         },
     });
 
@@ -36,7 +42,7 @@ exports.handler = async (event) => {
         statusCode: 200,
         body: JSON.stringify({
             app_metadata: {
-                roles: [subscription.items.data[0].price.product.name],
+                roles: [role],
             },
         }),
     };

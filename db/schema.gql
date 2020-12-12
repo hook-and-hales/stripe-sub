@@ -1,6 +1,9 @@
 type User {
     netlifyID: ID!
     stripeID: ID!
+    priceID: String
+    planID: String
+    planName: String
 }
 
 type Query {
