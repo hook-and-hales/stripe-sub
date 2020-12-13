@@ -21,6 +21,7 @@ exports.handler = async ({ body, headers }, context) => {
             query: `
                 query ($stripeID: ID!) {
                   getUserByStripeID(stripeID: $stripeID) {
+                    _id
                     netlifyID
                   }
                 }
@@ -31,10 +32,10 @@ exports.handler = async ({ body, headers }, context) => {
         });
 
         const { netlifyID } = result.data.getUserByStripeID;
+        console.log(result.data.getUserByStripeID)
         // const { faunaID } = result.data.getUserByStripeID._id;
 
         // take the first word of the plan name and use it as the role
-        console.log(subscription.items.data[0].plan.nickname);
         const plan = subscription.items.data[0].plan.nickname;
         const role = plan.split(' ')[0].toLowerCase();
 
