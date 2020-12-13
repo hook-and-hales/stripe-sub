@@ -40,7 +40,7 @@ exports.handler = async ({ body, headers }, context) => {
         // first send to fauna to update the user role
         await faunaFetch({
             query: `
-            mutation ($faunaID: ID, $netlifyID: ID!, $stripeID: ID!, $priceID: String, $planID: String, $planName: String) {
+            mutation ($faunaID: ID!, $netlifyID: ID!, $stripeID: ID!, $priceID: String, $planID: String, $planName: String) {
                 updateUser(id: $faunaID, data: { netlifyID: $netlifyID, stripeID: $stripeID, priceID: $priceID, planID: $planID, planName: $planName }) {
                     netlifyID
                     stripeID
