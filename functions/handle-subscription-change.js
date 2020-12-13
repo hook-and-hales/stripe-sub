@@ -31,8 +31,8 @@ exports.handler = async ({ body, headers }, context) => {
             },
         });
 
-        const { netlifyID } = result.data.getUserByStripeID;
         console.log(result.data.getUserByStripeID)
+        const { netlifyID } = result.data.getUserByStripeID;
         // const { faunaID } = result.data.getUserByStripeID._id;
 
         // take the first word of the plan name and use it as the role
