@@ -2,7 +2,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const fetch = require('node-fetch');
 const { faunaFetch } = require('./utils/fauna');
 
-exports.handlers = async ({ body, headers }, context) => {
+exports.handler = async ({ body, headers }, context) => {
     try {
         // make sure this event was sent legitimately
         const stripeEvent = stripe.webhooks.constructEvent(
@@ -39,27 +39,27 @@ exports.handlers = async ({ body, headers }, context) => {
         const role = plan.split(' ')[0].toLowerCase();
 
         // first send to fauna to update the user role
-        // await faunaFetch({
-        //     query: `
-        //     mutation ($netlifyID: ID!, $stripeID: ID!, $priceID: String, $planID: String, $planName: String) {
-        //         updateUser(id: $faunaID, data: { netlifyID: $netlifyID, stripeID: $stripeID, priceID: $priceID, planID: $planID, planName: $planName }) {
-        //             netlifyID
-        //             stripeID
-        //             priceID
-        //             planID
-        //             planName
-        //         }
-        //     }
-        // `,
-        //     variables: {
-        //         netlifyID: netlifyID,
-        //         stripeID: subscription.customer,
-        //         priceID: subscription.items.data[0].price.id,
-        //         planID: subscription.items.data[0].price.product.id,
-        //         planName: role,
-        //         faunaID: faunaID
-        //     },
-        // });
+        await faunaFetch({
+            query: `
+            mutation ($netlifyID: ID!, $stripeID: ID!, $priceID: String, $planID: String, $planName: String) {
+                updateUser(id: $faunaID, data: { netlifyID: $netlifyID, stripeID: $stripeID, priceID: $priceID, planID: $planID, planName: $planName }) {
+                    netlifyID
+                    stripeID
+                    priceID
+                    planID
+                    planName
+                }
+            }
+        `,
+            variables: {
+                netlifyID: netlifyID,
+                stripeID: subscription.customer,
+                priceID: subscription.items.data[0].price.id,
+                planID: subscription.items.data[0].price.product.id,
+                planName: role,
+                faunaID: faunaID
+            },
+        });
 
         // then send a call to the Netlify Identity admin API to update the user role
         const { identity } = context.clientContext;
