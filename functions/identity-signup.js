@@ -14,7 +14,8 @@ exports.handler = async (event) => {
         expand: ['items.data.price.product'],
     });
 
-    const role = subscription.items.data[0].price.product.name.toLowerCase();
+    const plan = subscription.items.data[0].plan.nickname;
+    const role = plan.split(' ')[0].toLowerCase();
 
     // store the Netlify and Stripe IDs in Fauna
     await faunaFetch({
