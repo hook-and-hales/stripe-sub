@@ -12,7 +12,6 @@ exports.handler = async ({ body, headers }, context) => {
         );
 
         // bail if this is not a subscription update event
-
         if (stripeEvent.type !== 'customer.subscription.updated') return;
 
         const subscription = stripeEvent.data.object;
@@ -31,36 +30,37 @@ exports.handler = async ({ body, headers }, context) => {
             },
         });
 
-        console.log(result.data.getUserByStripeID)
-        const { netlifyID } = result.data.getUserByStripeID;
-        // const { faunaID } = result.data.getUserByStripeID._id;
+        console.log(result.data.getUserByStripeID.netlifyID)
+        console.log(result.data.getUserByStripeID._id)
+        const netlifyID = result.data.getUserByStripeID.netlifyID;
+        const faunaID = result.data.getUserByStripeID._id;
 
         // take the first word of the plan name and use it as the role
         const plan = subscription.items.data[0].plan.nickname;
         const role = plan.split(' ')[0].toLowerCase();
 
         // first send to fauna to update the user role
-        // await faunaFetch({
-        //     query: `
-        //     mutation ($netlifyID: ID!, $stripeID: ID!, $priceID: String, $planID: String, $planName: String) {
-        //         updateUser(id: $faunaID, data: { netlifyID: $netlifyID, stripeID: $stripeID, priceID: $priceID, planID: $planID, planName: $planName }) {
-        //             netlifyID
-        //             stripeID
-        //             priceID
-        //             planID
-        //             planName
-        //         }
-        //     }
-        // `,
-        //     variables: {
-        //         netlifyID: netlifyID,
-        //         stripeID: subscription.customer,
-        //         priceID: subscription.items.data[0].price.id,
-        //         planID: subscription.items.data[0].price.product.id,
-        //         planName: role,
-        //         faunaID: faunaID
-        //     },
-        // });
+        await faunaFetch({
+            query: `
+            mutation ($netlifyID: ID!, $stripeID: ID!, $priceID: String, $planID: String, $planName: String) {
+                updateUser(id: $faunaID, data: { netlifyID: $netlifyID, stripeID: $stripeID, priceID: $priceID, planID: $planID, planName: $planName }) {
+                    netlifyID
+                    stripeID
+                    priceID
+                    planID
+                    planName
+                }
+            }
+        `,
+            variables: {
+                netlifyID: netlifyID,
+                stripeID: subscription.customer,
+                priceID: subscription.items.data[0].price.id,
+                planID: subscription.items.data[0].price.product.id,
+                planName: role,
+                faunaID: faunaID
+            },
+        });
 
         // then send a call to the Netlify Identity admin API to update the user role
         const { identity } = context.clientContext;
