@@ -54,7 +54,7 @@ exports.handler = async ({ body, headers }, context) => {
                 netlifyID: netlifyID,
                 stripeID: subscription.customer,
                 priceID: subscription.items.data[0].price.id,
-                planID: subscription.items.data[0].price.product.id,
+                planID: subscription.items.data[0].price.product,
                 planName: role,
                 faunaID: faunaID
             },
