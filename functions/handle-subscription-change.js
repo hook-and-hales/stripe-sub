@@ -30,8 +30,6 @@ exports.handler = async ({ body, headers }, context) => {
             },
         });
 
-        console.log(result.data.getUserByStripeID.netlifyID)
-        console.log(result.data.getUserByStripeID._id)
         const netlifyID = result.data.getUserByStripeID.netlifyID;
         const faunaID = result.data.getUserByStripeID._id;
 
@@ -42,7 +40,7 @@ exports.handler = async ({ body, headers }, context) => {
         // first send to fauna to update the user role
         await faunaFetch({
             query: `
-            mutation ($netlifyID: ID!, $stripeID: ID!, $priceID: String, $planID: String, $planName: String) {
+            mutation ($faunaID: ID, $netlifyID: ID!, $stripeID: ID!, $priceID: String, $planID: String, $planName: String) {
                 updateUser(id: $faunaID, data: { netlifyID: $netlifyID, stripeID: $stripeID, priceID: $priceID, planID: $planID, planName: $planName }) {
                     netlifyID
                     stripeID
