@@ -1,5 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { faunaFetch } = require('./uitls/fauna');
+const { faunaFetch } = require('./utils/fauna');
 
 exports.handler = async (_event, context) => {
     const { user } = context.clientContext;
